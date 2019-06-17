@@ -4,9 +4,85 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Hello World!</title>
+    <title>welcome | moklo</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <style>
+      html,
+      body {
+        width: 100vw;
+        height: 100vh;
+        font-family: monospace;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background: center;
+        background-size: cover;
+      }
+      .wrap::before {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(255, 255, 255, 0.5);
+      }
+      blockquote {
+        max-width: 50%;
+        margin: 30px;
+        font-size: 2.5vw;
+        position: relative;
+        z-index: 2;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <div class="wrap">
+      <blockquote>
+        <p class="quote"></p>
+        <cite class="author"></cite>
+      </blockquote>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      jQuery(document).ready(function($) {
+        const wrap = document.querySelector(".wrap"),
+          content = document.querySelector(".quote"),
+          author = document.querySelector(".author");
+        $.getJSON("https://quotes.rest/qod.json", resp => {
+          if (typeof resp.success !== "undefined") {
+            let data = resp.contents.quotes[0];
+            wrap.style.backgroundImage = `url('${data.background}')`;
+            content.innerHTML = data.quote;
+            author.innerHTML = data.author;
+          }
+        });
+      });
+    </script>
   </body>
 </html>
