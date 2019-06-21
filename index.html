@@ -5,20 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>welcome | moklo</title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
       html,
       body {
         width: 100vw;
         height: 100vh;
-        font-family: monospace;
-        font-size: 16px;
-        line-height: 1.6;
       }
       .wrap {
         display: flex;
@@ -41,9 +37,17 @@
       blockquote {
         max-width: 50%;
         margin: 30px;
-        font-size: 2.5vw;
         position: relative;
         z-index: 2;
+        line-height: 1.6;
+        color: #333;
+        font-size: 2vw;
+        font-family: monospace;
+      }
+      blockquote > p {
+        margin-bottom: 1rem;
+        font-weight: bold;
+        font-style: italic;
       }
     </style>
   </head>
@@ -51,37 +55,50 @@
     <div class="wrap">
       <blockquote>
         <p class="quote"></p>
-        <cite class="author"></cite>
+        <footer class="author"></footer>
       </blockquote>
     </div>
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.min.js"
-      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"
-    ></script>
     <script>
-      jQuery(document).ready(function($) {
-        const wrap = document.querySelector(".wrap"),
-          content = document.querySelector(".quote"),
-          author = document.querySelector(".author");
-        $.getJSON("https://quotes.rest/qod.json", resp => {
-          if (typeof resp.success !== "undefined") {
-            let data = resp.contents.quotes[0];
-            wrap.style.backgroundImage = `url('${data.background}')`;
-            content.innerHTML = data.quote;
-            author.innerHTML = data.author;
+      document.addEventListener("DOMContentLoaded", event => {
+        // Get the data
+        let item = JSON.parse(localStorage.getItem("quote"));
+                
+        // Fetch new data if null or expired
+        if (item === null || item.expiry > Date.now()) {
+          fetch("https://quotes.rest/qod.json")
+            .then(resp => resp.json())
+            .then(resp => {
+              if (!resp.success) {
+                return;
+              }
+
+              item = {
+                data: resp.contents.quotes[0],
+                expiry: (Math.floor(Date.now() / 1000)) + (60 * 60 * 3), // 3 hours
+              };
+
+              localStorage.setItem("quote", JSON.stringify(item));
+              setDOM(item);
+            });
+        } else {
+          setDOM(item);
+        }
+
+        function setDOM(item) {
+          const wrap = document.querySelector(".wrap"),
+            quote = document.querySelector(".quote"),
+            author = document.querySelector(".author");
+
+          if (typeof item.data.background !== 'undefined') {
+            wrap.style.backgroundImage = `url('${item.data.background}')`;
           }
-        });
+          if (typeof item.data.quote !== 'undefined') {
+            quote.innerHTML = item.data.quote;
+          }
+          if (typeof item.data.author !== 'undefined') {
+            author.innerHTML = item.data.author;
+          }
+        }
       });
     </script>
   </body>
